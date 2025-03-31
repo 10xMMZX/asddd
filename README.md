@@ -1415,7 +1415,6 @@ local Effects = {
         DhLibrary:RemoveConnection("TeleportPlayer")        
     end,
 }
--- local function cause global is useless
 local function effect(targetCharacter)
     local currentTime = tick()
     if currentTime - StompModule.lastStompTime < StompModule.StompCooldown then 
@@ -1481,38 +1480,31 @@ local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local SoundService = game:GetService("SoundService")
 
--- Function to save selected stomp effect
 local function saveEffect(effect)
     local data = { selectedEffect = effect }
     writefile(fileName, HttpService:JSONEncode(data))
 end
 
--- Function to load saved stomp effect
 local function loadEffect()
     if isfile(fileName) then
         local data = HttpService:JSONDecode(readfile(fileName))
         return data.selectedEffect
     else
-        -- If no save file exists, create one with "Atomic" as the default effect
         local defaultEffect = "Atomic"
         saveEffect(defaultEffect)
         return defaultEffect
     end
 end
 
--- Initialize StompModule effects
 for name, func in pairs(Effects) do 
     table.insert(StompModule.CurrentEffects, name)
 end
 
--- Load previously saved effect
 local savedStompEffect = loadEffect()
 StompModule.StompEffect = savedStompEffect
 
--- Always enabled
 StompModule:Toggle(true)
 
--- Function to create a smooth popup message
 local function showPopup(message, duration)
     local screenGui = Instance.new("ScreenGui")
     screenGui.Parent = player:FindFirstChild("PlayerGui")
@@ -1529,22 +1521,18 @@ local function showPopup(message, duration)
     textLabel.BackgroundTransparency = 1
     textLabel.BorderSizePixel = 0
     
-    -- Tween for smooth fade-in
     local tweenService = game:GetService("TweenService")
     local fadeIn = tweenService:Create(textLabel, TweenInfo.new(1), {TextTransparency = 0})
     fadeIn:Play()
     
-    -- Play bell sound
     local sound = Instance.new("Sound")
     sound.Parent = SoundService
     sound.SoundId = "rbxassetid://97881181065416"
     sound.Volume = 1
     sound:Play()
     
-    -- Wait for duration
     task.wait(duration)
     
-    -- Tween for smooth fade-out
     local fadeOut = tweenService:Create(textLabel, TweenInfo.new(1), {TextTransparency = 1})
     fadeOut:Play()
     fadeOut.Completed:Wait()
@@ -1552,7 +1540,6 @@ local function showPopup(message, duration)
     screenGui:Destroy()
 end
 
--- Show "Loaded!" popup for 7 seconds
 showPopup("Stomp effect Loaded! (" .. savedStompEffect .. ")", 5)
 
 return StompModule, DhLibrary
